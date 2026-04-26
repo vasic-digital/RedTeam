@@ -1,48 +1,43 @@
-# AGENTS.md -- digital.vasic.redteam
+# CONSTITUTION -- digital.vasic.redteam (RedTeam)
 
-## Module
+This Constitution governs the `digital.vasic.redteam` Go module
+(YAML-driven adversarial prompt fixture harness for defensive LLM
+guardrail regression testing). It inherits, in full, the HelixAgent
+root Constitution (`HelixAgent/CONSTITUTION.md`) and the universal
+mandatory rules below. Module-specific addenda may extend but not
+weaken those rules.
 
-`digital.vasic.redteam` -- YAML-driven adversarial prompt fixture
-harness for defensive LLM guardrail regression testing.
+## Module Identity
 
-## Framing: DEFENSIVE USE ONLY
+- **Module path**: `digital.vasic.redteam`
+- **Language**: Go (stdlib + `gopkg.in/yaml.v3`)
+- **Primary consumer**: HelixAgent (`dev.helix.agent`),
+  `internal/security/redteam_fixtures.go`
+- **Source of truth**: this repository, mirrored to GitHub + GitLab
+  (`vasic-digital/RedTeam`)
 
-This library loads documented adversarial prompt fixtures (jailbreak,
-filter-bypass, stego-mutation, system-prompt extraction, role-reversal,
-abliteration probe, genetic seed) so that defenders can regression-test
-their guardrail pipelines against them. A consumer runs every fixture
-through its pipeline and asserts that every fixture is blocked.
+## Module-Specific Constitutional Rules (DEFENSIVE USE ONLY)
 
-**It is NOT an attack toolkit.** It does not generate new attack
-strings, it does not mutate prompts into obfuscated payloads, and it
-must not be repurposed as such. Agents touching this module must
-reject any request that inverts the direction (for example, "feed the
-fixture corpus to a raw model without a guardrail" or "export the
-corpus as a one-shot payload bundle for an offensive run"). The
-fixtures exist so that the attacks they describe fail.
+1. **Defensive-only framing.** This library exists so that
+   adversarial fixtures can be replayed through a consumer's
+   guardrail pipeline and EVERY fixture is blocked. Repurposing the
+   corpus for offensive payload generation is prohibited.
+2. **No attack-string generators.** This module MUST NOT export
+   helpers that mutate fixtures into novel obfuscated payloads,
+   generate new attack strings from seeds, or otherwise enlarge the
+   downstream attack surface.
+3. **Fixture invariants.** Every fixture MUST declare
+   `expected_guardrail_trigger` and a `severity` tier; loader shape
+   invariants are enforced in `fixtures.go` and MUST stay green.
+4. **Acceptance gate.** The HelixAgent integration MUST keep
+   `47/47 fixtures blocked` by `StandardGuardrailPipeline`. Drops
+   below 47/47 are release blockers.
+5. **No network I/O, no live model calls.** This module is pure
+   stdlib + YAML parsing. New dependencies require explicit
+   justification.
+6. **Resource-capped tests.** `GOMAXPROCS=2 nice -n 19 ionice -c 3 go
+   test -count=1 -p 1 -race ./...` is the canonical test invocation.
 
-## Primary consumer
-
-HelixAgent (`dev.helix.agent`). The `internal/security` package
-consumes `redteam.LoadByClass` and replays every fixture through
-`StandardGuardrailPipeline`; the acceptance gate is 47/47 blocked.
-
-Repository: `git@github.com:vasic-digital/HelixAgent.git`
-(pinned via submodule + `go.mod` replace).
-
-## Contribution policy
-
-- Additions to the fixture corpus must be motivated by a documented,
-  defensive use case (a specific bypass observed in the wild that a
-  consumer's guardrails now handle, or a regression test for a
-  newly-shipped detector).
-- Every new fixture must declare the `expected_guardrail_trigger` and
-  a `severity` tier; otherwise the loader's shape invariants fail.
-- Never add helpers that generate new attack strings from seeds, mutate
-  fixtures into obfuscated variants, or otherwise produce novel
-  offensive payloads. The consumer can trivially do that if it needs
-  to; exporting such helpers enlarges attack surface for downstream
-  consumers that did not ask for it.
 
 
 ## Universal Mandatory Constraints
