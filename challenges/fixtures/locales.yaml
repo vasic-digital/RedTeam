@@ -1,0 +1,33 @@
+# challenges/fixtures/locales.yaml
+#
+# Round-281 5-locale UX evidence fixtures for digital.vasic.redteam.
+# Mirrors the strings emitted by challenges/runner/main.go so that
+# operator-facing localisation regressions surface as fixture drift
+# during code review, not as silent UX bluffs in production.
+#
+# Strings are summary-line templates; %d substitutions are filled at
+# runtime with (class_count, fixture_count). The runner is the source
+# of truth — this file is a reviewer-visible mirror per CONST-046.
+
+schema_version: 1
+date_added: 2026-05-19
+notes: |
+  Defensive use only. These strings DESCRIBE the corpus state to
+  human operators. They contain no adversarial content and no
+  invocation of any attack pattern.
+locales:
+  - tag: en
+    template: "[en] redteam: %d attack classes loaded, %d fixtures parsed (defensive-use only)"
+    note: "English baseline — matches the canonical token 'redteam:' grepped by the Challenge."
+  - tag: sr
+    template: "[sr] redteam: %d napadnih klasa učitano, %d fiksacija obrađeno (samo za odbranu)"
+    note: "Serbian Latin — Cyrillic transliteration permitted as long as canonical token preserved."
+  - tag: ja
+    template: "[ja] redteam: %d 個の攻撃クラス、%d 個のフィクスチャを読み込み(防御用途のみ)"
+    note: "Japanese — full-width comma + parens, defensive-use clause preserved."
+  - tag: es
+    template: "[es] redteam: %d clases de ataque cargadas, %d fixtures parseados (uso defensivo)"
+    note: "Spanish — neutral gender for 'cargadas'; UX phrase mirrors English."
+  - tag: de
+    template: "[de] redteam: %d Angriffsklassen geladen, %d Fixtures geparst (nur Verteidigung)"
+    note: "German — compound noun 'Angriffsklassen'; defensive clause shortened."
